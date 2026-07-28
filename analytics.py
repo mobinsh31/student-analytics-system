@@ -42,7 +42,7 @@ def get_failed_student(scores, student_names):
     failed_students = []
 
     for i in range(len(averages)):
-        if averages[i] < 12:
+        if averages[i] < 70:
             failed_students.append((student_names[i], averages[i]))
 
     return failed_students
