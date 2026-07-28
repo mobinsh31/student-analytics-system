@@ -1,3 +1,4 @@
+from data import scores, student_names, course_names
 import numpy as np
 
 # Student Average
@@ -33,6 +34,7 @@ def get_worst_course(scores, course_names) :
   course_averages=calculate_course_averages (scores)
   worst_course_index = np.argmin(course_averages)
   return course_names[worst_course_index], course_averages[worst_course_index]
+
 #Failed Students
 def get_failed_student(scores, student_names):
     averages = calculate_student_averages(scores)
@@ -65,7 +67,14 @@ def get_top_N_students(scores, student_names, n):
 #Student Report
 def student_report(scores, student_names, course_names, student_name):
 
-    student_index = student_names.index(student_name)
+    student_names_lower = [name.lower() for name in student_names]
+
+    student_name = student_name.strip().lower()
+
+    try:
+        student_index = student_names_lower.index(student_name)
+    except ValueError:
+        return None
 
     student_scores = scores[student_index]
 
@@ -77,16 +86,37 @@ def student_report(scores, student_names, course_names, student_name):
     rank = 1
 
     for name, average in ranking:
-        if name == student_name:
+        if name.lower() == student_name:
             break
         rank += 1
 
-
-    report = {
-        "name": student_name,
+    return {
+        "name": student_names[student_index],
         "scores": dict(zip(course_names, student_scores)),
         "average": student_average,
         "rank": rank
     }
 
-    return report
+def get_class_statistics(scores):
+
+    number_of_students = scores.shape[0]
+
+    number_of_courses = scores.shape[1]
+
+    overall_average = scores.mean()
+
+    student_averages = calculate_student_averages(scores)
+
+    conditional_mask = student_averages < 12
+
+    conditional_students = len(student_averages[conditional_mask])
+
+    passed_students = number_of_students - conditional_students
+
+    return {
+        "number_of_students": number_of_students,
+        "number_of_courses": number_of_courses,
+        "overall_average": overall_average,
+        "conditional_students": conditional_students,
+        "passed_students": passed_students
+    }
